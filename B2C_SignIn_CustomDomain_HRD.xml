@@ -53,8 +53,7 @@
                 </InputClaims>
                 <InputParameters>
                     <!-- TODO: Replace `Value=` with your custom domain -->
-                    <!-- <InputParameter Id="oldValue" DataType="string" Value=".landonpierce.io" /> -->
-                    <InputParameter Id="oldValue" DataType="string" Value=".b2clogin.com" />
+                    <InputParameter Id="oldValue" DataType="string" Value=".landonpierce.io" />
                     <InputParameter Id="newValue" DataType="string" Value="" />
                 </InputParameters>
                 <OutputClaims>
@@ -76,6 +75,7 @@
                         <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
                     </Metadata>
                     <InputClaims>
+                     <!-- This is called a ClaimsResolver. {Context:HostName} will automatically resolve to whatever the hostname the user is at. https://learn.microsoft.com/en-us/azure/active-directory-b2c/claim-resolver-overview -->
                         <InputClaim ClaimTypeReferenceId="hostName"
                             DefaultValue="{Context:HostName}" AlwaysUseDefaultValue="true" />
                     </InputClaims>
@@ -107,8 +107,8 @@
                             https://login.windows.net/jasjeetaad.onmicrosoft.com/.well-known/openid-configuration</Item>
                         <Item Key="ProviderName">
                             https://sts.windows.net/06a05be1-33df-4feb-9009-95c7a27a7a49/</Item>
-                        <Item Key="client_id">a963bb4d-6216-4904-b07d-251bfbfe19c8</Item>
-                        <Item Key="IdTokenAudience">a963bb4d-6216-4904-b07d-251bfbfe19c8</Item>
+                        <Item Key="client_id">{yourguidhere}</Item>
+                        <Item Key="IdTokenAudience">{yourguidhere}</Item>
                         <Item Key="UsePolicyInRedirectUri">false</Item>
                         <Item Key="resource">https://graph.windows.net</Item>
                         <Item Key="response_types">code id_token</Item>
@@ -116,8 +116,8 @@
                         <Item Key="response_mode">form_post</Item>
                         <Item Key="HttpBinding">POST</Item>
                         <Item Key="ClaimTypeOnWhichToEnable">identityProviders</Item>
-                        <!-- Specify which subdomain you'd like to use this identity provider. Note you can specify multiple: https://learn.microsoft.com/en-us/azure/active-directory-b2c/technicalprofiles#enabled-for-user-journeys -->
-                        <Item Key="ClaimValueOnWhichToEnable">b2ccontentcontributiondev</Item>
+                        <!-- Specify which subdomain you'd like to use for this identity provider. Note you can specify multiple: https://learn.microsoft.com/en-us/azure/active-directory-b2c/technicalprofiles#enabled-for-user-journeys -->
+                        <Item Key="ClaimValueOnWhichToEnable">customer1</Item>
                     </Metadata>
                     <CryptographicKeys>
                         <Key Id="client_secret" StorageReferenceId="B2C_1A_aadSecretFederation" />
@@ -166,9 +166,9 @@
                         <Item Key="scope">openid profile email</Item>
                         <Item Key="HttpBinding">POST</Item>
                         <Item Key="UsePolicyInRedirectUri">0</Item>
-                        <Item Key="client_id">651e1987-1600-4908-98da-65a0696c7ee5</Item>
+                        <Item Key="client_id">{yourguidhere}</Item>
                         <Item Key="ClaimTypeOnWhichToEnable">identityProviders</Item>
-                        <!-- Specify which subdomain you'd like to use this identity provider. Note you can specify multiple: https://learn.microsoft.com/en-us/azure/active-directory-b2c/technicalprofiles#enabled-for-user-journeys -->
+                        <!-- Specify which subdomain you'd like to use for this identity provider. Note you can specify multiple: https://learn.microsoft.com/en-us/azure/active-directory-b2c/technicalprofiles#enabled-for-user-journeys -->
                         <Item Key="ClaimValueOnWhichToEnable">customer2</Item>
                     </Metadata>
                     <CryptographicKeys>
