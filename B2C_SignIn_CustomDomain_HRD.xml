@@ -1,14 +1,14 @@
 <TrustFrameworkPolicy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" PolicySchemaVersion="0.3.0.0"
-    TenantId="b2ccontentcontributiondev.onmicrosoft.com"
+    TenantId="yourtenant.onmicrosoft.com"
     PolicyId="B2C_1A_SignIn_CustomDomain_HRD"
-    PublicPolicyUri="http://b2ccontentcontributiondev.onmicrosoft.com/B2C_1A_SignIn_CustomDomain_HRD"
-    TenantObjectId="b2ccontentcontributiondev.onmicrosoft.com"
+    PublicPolicyUri="http://yourtenant.onmicrosoft.com/B2C_1A_SignIn_CustomDomain_HRD"
+    TenantObjectId="yourtenant.onmicrosoft.com"
     DeploymentMode="Development"
     UserJourneyRecorderEndpoint="urn:journeyrecorder:applicationinsights">
     <BasePolicy>
-        <TenantId>b2ccontentcontributiondev.onmicrosoft.com</TenantId>
+        <TenantId>yourtenant.onmicrosoft.com</TenantId>
         <PolicyId>B2C_1A_TrustFrameworkExtensions</PolicyId>
     </BasePolicy>
     <BuildingBlocks>
