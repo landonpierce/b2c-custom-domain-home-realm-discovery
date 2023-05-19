@@ -2,8 +2,6 @@
 
 This is an example custom policy for doing home realm discovery using [custom domains](https://learn.microsoft.com/en-us/azure/active-directory-b2c/custom-domain). This will allow you to automatically pre-select the identity provider that you'd like the user to sign in with based on what domain they are accessing B2C with. 
 
-Prerequisites: 
-
 ### Prerequisites
 
 - You must first setup your B2C tenant for use by custom policies and deploy the custom policy [starter pack](https://learn.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-user-flows?pivots=b2c-custom-policy#get-the-starter-pack). This sample has dependencies on some claims and values found in the starter pack. You can automate this setup by using the [setup tool](https://aka.ms/iefsetup) if you already have an Azure AD B2C tenant and have not gone through the [setup steps](https://learn.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-user-flows?pivots=b2c-custom-policy) yet.
