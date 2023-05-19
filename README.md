@@ -16,4 +16,4 @@ This is an example custom policy for doing home realm discovery using [custom do
 Other resources/samples:
 
 - [Host name validation](https://github.com/azure-ad-b2c/samples/tree/master/policies/check-host-name)
-- ["Modern" home realm discovery](https://github.com/azure-ad-b2c/samples/tree/master/policies/home-realm-discovery-modern)
+- [Home realm discovery via email](https://github.com/azure-ad-b2c/samples/tree/master/policies/home-realm-discovery-modern)
