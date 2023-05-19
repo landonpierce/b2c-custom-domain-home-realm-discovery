@@ -1,4 +1,4 @@
-# Azure AD B2C Home Realm Discovery using Custom Domainsb2c-custom-domain-home-realm-discovery
+# Azure AD B2C Home Realm Discovery using Custom Domains
 
 This is an example custom policy for doing home realm discovery using [custom domains](https://learn.microsoft.com/en-us/azure/active-directory-b2c/custom-domain). This will allow you to automatically pre-select the identity provider that you'd like the user to sign in with based on what domain they are accessing B2C with. 
 
