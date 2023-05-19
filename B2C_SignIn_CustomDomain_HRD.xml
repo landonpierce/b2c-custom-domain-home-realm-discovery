@@ -13,38 +13,10 @@
     </BasePolicy>
     <BuildingBlocks>
         <ClaimsSchema>
-            <ClaimType Id="signInName">
-                <DisplayName>Enter your Email address</DisplayName>
-                <UserHelpText>Email address to use for signing in.</UserHelpText>
-                <Restriction>
-                    <Pattern RegularExpression="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-                        HelpText="The email you provided is not valid." />
-                </Restriction>
-            </ClaimType>
             <ClaimType Id="identityProviders">
                 <DisplayName>IdentityProviders</DisplayName>
                 <DataType>stringCollection</DataType>
                 <UserHelpText>User identity providers</UserHelpText>
-            </ClaimType>
-            <!-- <ClaimType Id="domainParameter">
-                <DisplayName>domainParameter</DisplayName>
-                <DataType>string</DataType>
-                <UserHelpText>parsed domain value from url</UserHelpText>
-            </ClaimType> -->
-            <ClaimType Id="knownCustomer">
-                <DisplayName>knownDomain</DisplayName>
-                <DataType>string</DataType>
-                <UserHelpText>if this a domain that is a customer</UserHelpText>
-            </ClaimType>
-            <ClaimType Id="isKnownCustomer">
-                <DisplayName>knownDomain</DisplayName>
-                <DataType>boolean</DataType>
-                <UserHelpText>if this a domain that is a customer</UserHelpText>
-            </ClaimType>
-            <ClaimType Id="dummyTrue">
-                <DisplayName>dummy value for comparison</DisplayName>
-                <DataType>string</DataType>
-                <UserHelpText />
             </ClaimType>
             <ClaimType Id="hostName">
                 <DisplayName>hostName</DisplayName>
@@ -60,52 +32,6 @@
             </ClaimType>
         </ClaimsSchema>
         <ClaimsTransformations>
-            <!--Demo:
-            Gets the domain portion of the sign-in email address-->
-            <!-- <ClaimsTransformation Id="ParseDomain" TransformationMethod="ParseDomain">
-                <InputClaims>
-                    <InputClaim ClaimTypeReferenceId="signInName"
-                        TransformationClaimType="emailAddress" />
-                </InputClaims>
-                <OutputClaims>
-                    <OutputClaim ClaimTypeReferenceId="domainParameter"
-                        TransformationClaimType="domain" />
-                </OutputClaims>
-            </ClaimsTransformation> -->
-            <ClaimsTransformation Id="CustomerLookup" TransformationMethod="LookupValue">
-                <InputClaims>
-                    <InputClaim ClaimTypeReferenceId="customerId"
-                        TransformationClaimType="inputParameterId" />
-                </InputClaims>
-                <InputParameters>
-                    <InputParameter Id="jsuri.com" DataType="string" Value="true" />
-                    <InputParameter Id="b2ccontentcontributiondev" DataType="string" Value="true" />
-                    <InputParameter Id="errorOnFailedLookup" DataType="boolean" Value="false" />
-                </InputParameters>
-                <OutputClaims>
-                    <OutputClaim ClaimTypeReferenceId="knownCustomer"
-                        TransformationClaimType="outputClaim" />
-                </OutputClaims>
-            </ClaimsTransformation>
-
-            <ClaimsTransformation Id="CheckCustomerParameterValue"
-                TransformationMethod="CompareClaims">
-                <InputClaims>
-                    <InputClaim ClaimTypeReferenceId="knownCustomer"
-                        TransformationClaimType="inputClaim1" />
-                    <InputClaim ClaimTypeReferenceId="dummyTrue"
-                        TransformationClaimType="inputClaim2" />
-                </InputClaims>
-                <InputParameters>
-                    <InputParameter Id="operator" DataType="string" Value="EQUAL" />
-                    <InputParameter Id="ignoreCase" DataType="string" Value="true" />
-                </InputParameters>
-                <OutputClaims>
-                    <OutputClaim ClaimTypeReferenceId="isKnownCustomer"
-                        TransformationClaimType="outputClaim" />
-                </OutputClaims>
-            </ClaimsTransformation>
-
             <ClaimsTransformation Id="CreateidentityProvidersCollection"
                 TransformationMethod="AddItemToStringCollection">
                 <InputClaims>
@@ -119,8 +45,8 @@
                         TransformationClaimType="collection" />
                 </OutputClaims>
             </ClaimsTransformation>
-            <!-- Transformation to remove the apex domain name so all we're left with the customer
-            identifier -->
+            <!-- Transformation to remove the apex domain name from the host so all we're left with the customer
+            identifier from the subdomain-->
             <ClaimsTransformation Id="ParseHostName" TransformationMethod="StringReplace">
                 <InputClaims>
                     <InputClaim ClaimTypeReferenceId="hostName" TransformationClaimType="inputClaim" />
@@ -152,19 +78,13 @@
                     <InputClaims>
                         <InputClaim ClaimTypeReferenceId="hostName"
                             DefaultValue="{Context:HostName}" AlwaysUseDefaultValue="true" />
-                        <InputClaim ClaimTypeReferenceId="dummyTrue" DefaultValue="true" />
-                        <!-- <InputClaim ClaimTypeReferenceId="signInName" /> -->
                     </InputClaims>
                     <OutputClaims>
                         <OutputClaim ClaimTypeReferenceId="identityProviders" />
-                        <!-- <OutputClaim ClaimTypeReferenceId="knownDomain" /> -->
                     </OutputClaims>
                     <OutputClaimsTransformations>
                         <!-- Parse customer id out of host name -->
                         <OutputClaimsTransformation ReferenceId="ParseHostName" />
-                        <!-- Look up to see if they are a known customer and assert  -->
-                        <OutputClaimsTransformation ReferenceId="CustomerLookup" />
-                        <OutputClaimsTransformation ReferenceId="CheckCustomerParameterValue" />
                         <!-- Create collection of enabled identity providers based on which customer
                         it is -->
                         <OutputClaimsTransformation ReferenceId="CreateidentityProvidersCollection" />
@@ -196,7 +116,8 @@
                         <Item Key="response_mode">form_post</Item>
                         <Item Key="HttpBinding">POST</Item>
                         <Item Key="ClaimTypeOnWhichToEnable">identityProviders</Item>
-                        <Item Key="ClaimValueOnWhichToEnable">customer1</Item>
+                        <!-- Specify which subdomain you'd like to use this identity provider. Note you can specify multiple: https://learn.microsoft.com/en-us/azure/active-directory-b2c/technicalprofiles#enabled-for-user-journeys -->
+                        <Item Key="ClaimValueOnWhichToEnable">b2ccontentcontributiondev</Item>
                     </Metadata>
                     <CryptographicKeys>
                         <Key Id="client_secret" StorageReferenceId="B2C_1A_aadSecretFederation" />
@@ -247,7 +168,8 @@
                         <Item Key="UsePolicyInRedirectUri">0</Item>
                         <Item Key="client_id">651e1987-1600-4908-98da-65a0696c7ee5</Item>
                         <Item Key="ClaimTypeOnWhichToEnable">identityProviders</Item>
-                        <Item Key="ClaimValueOnWhichToEnable">b2ccontentcontributiondev</Item>
+                        <!-- Specify which subdomain you'd like to use this identity provider. Note you can specify multiple: https://learn.microsoft.com/en-us/azure/active-directory-b2c/technicalprofiles#enabled-for-user-journeys -->
+                        <Item Key="ClaimValueOnWhichToEnable">customer2</Item>
                     </Metadata>
                     <CryptographicKeys>
                         <Key Id="client_secret" StorageReferenceId="B2C_1A_MSASecret" />
@@ -277,33 +199,8 @@
                 </TechnicalProfile>
             </TechnicalProfiles>
         </ClaimsProvider>
-        <!--Demo:
-        This technical profile collects the sign-in email address and extracts the sign-in domain
-        name -->
-        <!-- <ClaimsProvider>
-            <DisplayName>Local Account</DisplayName>
-            <TechnicalProfiles>
-                <TechnicalProfile Id="SelfAsserted-Signin-Email">
-                    <DisplayName>Local Account Signin</DisplayName>
-                    <Protocol Name="Proprietary"
-                        Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0,
-        Culture=neutral, PublicKeyToken=null" />
-                    <Metadata>
-                        <Item Key="ContentDefinitionReferenceId">api.selfasserted</Item>
-                    </Metadata>
-                    <IncludeInSso>false</IncludeInSso>
-                    <InputClaims>
-                        <InputClaim ClaimTypeReferenceId="signInName" />
-                    </InputClaims>
-                    <OutputClaims>
-                        <OutputClaim ClaimTypeReferenceId="signInName" Required="true" />
-                    </OutputClaims>
-                    <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
-                </TechnicalProfile>
-            </TechnicalProfiles>
-        </ClaimsProvider> -->
 
-        <!-- Disable Sign Up-->
+        <!-- Disable Sign Up in this flow-->
         <ClaimsProvider>
             <DisplayName>Local Account</DisplayName>
             <TechnicalProfiles>
@@ -320,114 +217,37 @@
         <UserJourney Id="SignIn">
 
             <OrchestrationSteps>
-                <!-- <OrchestrationStep Order="1" Type="ClaimsExchange">
-                    <ClaimsExchanges>
-                        <ClaimsExchange Id="SigninEmailExchange"
-                            TechnicalProfileReferenceId="SelfAsserted-Signin-Email" />
-                    </ClaimsExchanges>
-                </OrchestrationStep> -->
-
                 <OrchestrationStep Order="1" Type="ClaimsExchange">
                     <ClaimsExchanges>
                         <ClaimsExchange Id="ParseHostName"
                             TechnicalProfileReferenceId="HRDLogic" />
                     </ClaimsExchanges>
                 </OrchestrationStep>
-
-                <!-- If the domain_hint did not match any known domain, then redirect to a default
-                local account sign in-->
-                <OrchestrationStep Order="2" Type="CombinedSignInAndSignUp"
-                    ContentDefinitionReferenceId="api.signuporsignin">
-                    <Preconditions>
-                        <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
-                            <Value>isKnownCustomer</Value>
-                            <Value>True</Value>
-                            <Action>SkipThisOrchestrationStep</Action>
-                        </Precondition>
-                    </Preconditions>
-                    <ClaimsProviderSelections>
-                        <ClaimsProviderSelection
-                            ValidationClaimsExchangeId="LocalAccountSigninEmailExchange" />
-                    </ClaimsProviderSelections>
-                    <ClaimsExchanges>
-                        <ClaimsExchange Id="LocalAccountSigninEmailExchange"
-                            TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email" />
-                    </ClaimsExchanges>
-                </OrchestrationStep>
-                <!-- dont run this step if the domain was known, or we have an objectid (local
-                account sign in)-->
-                <OrchestrationStep Order="3" Type="ClaimsExchange">
-                    <Preconditions>
-                        <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-                            <Value>objectId</Value>
-                            <Action>SkipThisOrchestrationStep</Action>
-                        </Precondition>
-                        <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
-                            <Value>isKnownCustomer</Value>
-                            <Value>True</Value>
-                            <Action>SkipThisOrchestrationStep</Action>
-                        </Precondition>
-                    </Preconditions>
-                    <ClaimsExchanges>
-                        <ClaimsExchange Id="SignUpWithLogonEmailExchange"
-                            TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail" />
-                    </ClaimsExchanges>
-                </OrchestrationStep>
-
-                <!-- If the domain matched any known domain, then this step will have a single IdP
-                    enabled due to each known IdP TP having an enablement flag via identityProviders claim -->
-                <OrchestrationStep Order="4" Type="ClaimsProviderSelection"
+                <OrchestrationStep Order="2" Type="ClaimsProviderSelection"
                     ContentDefinitionReferenceId="api.idpselections">
-                    <Preconditions>
-                        <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
-                            <Value>isKnownCustomer</Value>
-                            <Value>True</Value>
-                            <Action>SkipThisOrchestrationStep</Action>
-                        </Precondition>
-                    </Preconditions>
                     <ClaimsProviderSelections>
+                    <!-- List all identity providers for all tenants here -->
                         <ClaimsProviderSelection TargetClaimsExchangeId="AADOIDC" />
                         <ClaimsProviderSelection TargetClaimsExchangeId="MSAOIDC" />
                     </ClaimsProviderSelections>
                 </OrchestrationStep>
-
-                <OrchestrationStep Order="5" Type="ClaimsExchange">
-                    <Preconditions>
-                        <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-                            <Value>objectId</Value>
-                            <Action>SkipThisOrchestrationStep</Action>
-                        </Precondition>
-                        <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
-                            <Value>isKnownCustomer</Value>
-                            <Value>True</Value>
-                            <Action>SkipThisOrchestrationStep</Action>
-                        </Precondition>
-                    </Preconditions>
+                <OrchestrationStep Order="3" Type="ClaimsExchange">
                     <ClaimsExchanges>
                         <ClaimsExchange Id="AADOIDC" TechnicalProfileReferenceId="AAD-OIDC" />
                         <ClaimsExchange Id="MSAOIDC" TechnicalProfileReferenceId="MSA-OIDC" />
                     </ClaimsExchanges>
                 </OrchestrationStep>
-
-                <!-- For social IDP authentication, attempt to find the user account in the
+                <!-- For federated IDP authentication, attempt to find the user account in the
                 directory. -->
-                <OrchestrationStep Order="6" Type="ClaimsExchange">
-                    <Preconditions>
-                        <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
-                            <Value>isKnownCustomer</Value>
-                            <Value>True</Value>
-                            <Action>SkipThisOrchestrationStep</Action>
-                        </Precondition>
-                    </Preconditions>
+                <OrchestrationStep Order="4" Type="ClaimsExchange">
                     <ClaimsExchanges>
                         <ClaimsExchange Id="AADUserReadUsingAlternativeSecurityId"
                             TechnicalProfileReferenceId="AAD-UserReadUsingAlternativeSecurityId-NoError" />
                     </ClaimsExchanges>
                 </OrchestrationStep>
-
                 <!-- Still dont have objectId (social idp user that doesnt yet exist) - write the
                 account -->
-                <OrchestrationStep Order="7" Type="ClaimsExchange">
+                <OrchestrationStep Order="5" Type="ClaimsExchange">
                     <Preconditions>
                         <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
                             <Value>objectId</Value>
@@ -439,28 +259,19 @@
                             TechnicalProfileReferenceId="AAD-UserWriteUsingAlternativeSecurityId" />
                     </ClaimsExchanges>
                 </OrchestrationStep>
-
-                <OrchestrationStep Order="8" Type="ClaimsExchange">
-                    <Preconditions>
-                        <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
-                            <Value>isKnownCustomer</Value>
-                            <Value>True</Value>
-                            <Action>SkipThisOrchestrationStep</Action>
-                        </Precondition>
-                    </Preconditions>
+                <OrchestrationStep Order="6" Type="ClaimsExchange">
                     <ClaimsExchanges>
                         <ClaimsExchange Id="AADUserReadWithObjectId"
                             TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
                     </ClaimsExchanges>
                 </OrchestrationStep>
 
-                <OrchestrationStep Order="9" Type="SendClaims"
+                <OrchestrationStep Order="7" Type="SendClaims"
                     CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
             </OrchestrationSteps>
             <ClientDefinition ReferenceId="DefaultWeb" />
         </UserJourney>
     </UserJourneys>
-
     <RelyingParty>
         <DefaultUserJourney ReferenceId="SignIn" />
         <UserJourneyBehaviors>
