@@ -5,8 +5,7 @@
     PolicyId="B2C_1A_SignIn_CustomDomain_HRD"
     PublicPolicyUri="http://yourtenant.onmicrosoft.com/B2C_1A_SignIn_CustomDomain_HRD"
     TenantObjectId="yourtenant.onmicrosoft.com"
-    DeploymentMode="Development"
-    UserJourneyRecorderEndpoint="urn:journeyrecorder:applicationinsights">
+    DeploymentMode="Development">
     <BasePolicy>
         <TenantId>yourtenant.onmicrosoft.com</TenantId>
         <PolicyId>B2C_1A_TrustFrameworkExtensions</PolicyId>
@@ -274,11 +273,6 @@
     </UserJourneys>
     <RelyingParty>
         <DefaultUserJourney ReferenceId="SignIn" />
-        <UserJourneyBehaviors>
-            <JourneyInsights TelemetryEngine="ApplicationInsights"
-                InstrumentationKey="8ec1061d-ea77-48cd-a423-86f04868d5e7" DeveloperMode="true"
-                ClientEnabled="false" ServerEnabled="true" TelemetryVersion="1.0.0" />
-        </UserJourneyBehaviors>
         <TechnicalProfile Id="PolicyProfile">
             <DisplayName>PolicyProfile</DisplayName>
             <Protocol Name="OpenIdConnect" />
